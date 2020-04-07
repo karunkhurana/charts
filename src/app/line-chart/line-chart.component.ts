@@ -10,7 +10,7 @@ import * as d3Axis from 'd3-axis';
 import * as d3Zoom from 'd3-zoom';
 import * as d3Brush from 'd3-brush';
 
-import * as d31 from 'd3';
+// import * as d31 from 'd3';
 
 import * as moment from 'moment';
 
@@ -59,8 +59,8 @@ export class LineChartComponent implements OnInit {
 
   constructor() {   
       // configure margins and width/height of the graph  
-  
-   this.width = 960 - this.margin.left - this.margin.right;  
+	  
+	this.width = 900 - this.margin.left - this.margin.right;  
    this.height = 500 - this.margin.top - this.margin.bottom;
    this.height2 = 500 - this.margin2.top - this.margin2.bottom;
    }  
@@ -76,7 +76,7 @@ export class LineChartComponent implements OnInit {
     console.log(newObj);
     this.selected = parseInt(newObj.target.value);
     d3.select("svg").remove(); 
-	var svg = d3.select("app-line-chart").append("svg").attr("width","960").attr("height", "600"),
+	var svg = d3.select("app-line-chart").append("svg").attr("width","900").attr("height", "600"),
 	inner = svg.append("g");               
 
     this.buildSvg();  
@@ -86,10 +86,8 @@ export class LineChartComponent implements OnInit {
 
   private buildSvg() {  
         this.svg = d3.select('svg')  
-            .append('g')  
             .style("stroke", "#000")
-			.style("fill", "#4682b3")
-            .attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');  
+			.style("fill", "#4682b3") 
     }  
     private addXandYAxis() {  
          // range of data configuring  
@@ -130,10 +128,11 @@ export class LineChartComponent implements OnInit {
 
 
         this.area = d3Shape.area()
+        	.curve(d3Shape.curveMonotoneX)
 	        .x((d: any) => this.x(moment("Wed Apr 01 2020 15:30:00 GMT-0500", "hh:mm:ss A")
         	.add(d.time * 5, 'minutes') ))
 	        .y0(this.height)
-	        .y((d: any) => this.y(d["Array"][this.selected]));
+	        .y1((d: any) => this.y(d["Array"][this.selected]));
 
 	    this.area2 = d3Shape.area()
 	        .curve(d3Shape.curveMonotoneX)
@@ -160,8 +159,8 @@ export class LineChartComponent implements OnInit {
 
 
   	private brushed() {
-	    if (d31.event.sourceEvent && d31.event.sourceEvent.type === 'zoom') return; // ignore brush-by-zoom
-	    let s = d31.event.selection || this.x2.range();
+	    if (d3.event.sourceEvent && d3.event.sourceEvent.type === 'zoom') return; // ignore brush-by-zoom
+	    let s = d3.event.selection || this.x2.range();
 	    this.x.domain(s.map(this.x2.invert, this.x2));
 	    this.focus.select('.area').attr('d', this.area);
 	    this.focus.select('.axis--x').call(this.xAxis);
@@ -184,18 +183,18 @@ export class LineChartComponent implements OnInit {
     private drawLineAndPath() {  
 
 
-    	this.x.domain(d3Array.extent(this.data, (d) => moment("Wed Apr 01 2020 15:30:00 GMT-0500", "hh:mm:ss A")
-        .add(d.time * 5, 'minutes') ));  
+    	this.x.domain(d3Array.extent(this.data, (d : any) => { return moment("Wed Apr 01 2020 15:30:00 GMT-0500", "hh:mm:ss A")
+    	        .add(d.time * 5, 'minutes') }));  
 
 
-        this.y.domain([0, d3Array.max(this.data, (d) => { return d["Array"][this.selected]; })])
+        this.y.domain([0, d3Array.max(this.data, (d : any) => { return d["Array"][this.selected]; })])
 
     	this.x2.domain(this.x.domain());
     	this.y2.domain(this.y.domain());
 
 
     	this.focus.append('path')
-	        .datum(data)
+	        .datum(this.data)
 	        .attr('class', 'area')
 	        .attr('d', this.area);
 
@@ -209,8 +208,9 @@ export class LineChartComponent implements OnInit {
 	        .call(this.yAxis);
 
 	    this.context.append('path')
-	        .datum(data)
+	        .datum(this.data)
 	        .attr('class', 'area')
+	        .attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')')
 	        .attr('d', this.area2);
 
 	    this.context.append('g')
@@ -224,6 +224,7 @@ export class LineChartComponent implements OnInit {
 	        .call(this.brush.move, this.x.range());
 
 	    this.svg.append('rect')
+	    	.style("fill", "transparent") 
 	        .attr('class', 'zoom')
 	        .attr('width', this.width)
 	        .attr('height', this.height)
