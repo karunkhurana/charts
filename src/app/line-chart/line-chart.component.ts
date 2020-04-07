@@ -196,6 +196,7 @@ export class LineChartComponent implements OnInit {
     	this.focus.append('path')
 	        .datum(this.data)
 	        .attr('class', 'area')
+	        .attr("clip-path", "url(#clip)")
 	        .attr('d', this.area);
 
 	    this.focus.append('g')
