@@ -60,7 +60,7 @@ export class LineChartComponent implements OnInit {
   constructor() {   
       // configure margins and width/height of the graph  
 	  
-	this.width = 900 - this.margin.left - this.margin.right;  
+	this.width = 960 - this.margin.left - this.margin.right;  
    this.height = 500 - this.margin.top - this.margin.bottom;
    this.height2 = 500 - this.margin2.top - this.margin2.bottom;
    }  
@@ -76,7 +76,7 @@ export class LineChartComponent implements OnInit {
     console.log(newObj);
     this.selected = parseInt(newObj.target.value);
     d3.select("svg").remove(); 
-	var svg = d3.select("app-line-chart").append("svg").attr("width","900").attr("height", "600"),
+	var svg = d3.select("app-line-chart").append("svg").attr("width","960").attr("height", "600"),
 	inner = svg.append("g");               
 
     this.buildSvg();  
@@ -210,7 +210,6 @@ export class LineChartComponent implements OnInit {
 	    this.context.append('path')
 	        .datum(this.data)
 	        .attr('class', 'area')
-	        .attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')')
 	        .attr('d', this.area2);
 
 	    this.context.append('g')
